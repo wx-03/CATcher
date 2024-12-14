@@ -62,6 +62,8 @@ export class SessionSelectionComponent implements OnInit {
 
     this.logger.info(`SessionSelectionComponent: Selected Settings Repo: ${sessionInformation}`);
 
+    this.phaseService.setProfileName(this.selectedProfile.profileName);
+
     this.phaseService.storeSessionData().subscribe(
       () => {
         try {

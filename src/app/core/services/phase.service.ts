@@ -30,6 +30,8 @@ export class PhaseService {
   private repoName: string;
   private orgName: string;
 
+  private profileName: string;
+
   public sessionData: SessionData;
 
   private phaseRepoOwners = {
@@ -52,6 +54,18 @@ export class PhaseService {
     this.phaseRepoOwners.phaseTeamResponse = org;
     this.phaseRepoOwners.phaseTesterResponse = user;
     this.phaseRepoOwners.phaseModeration = org;
+  }
+
+  /**
+   * Stores the name of the profile
+   * @param profileName - name of the current profile
+   */
+  setProfileName(profileName: string) {
+    this.profileName = profileName;
+  }
+
+  getProfileName(): string {
+    return this.profileName;
   }
 
   /**
