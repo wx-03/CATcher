@@ -16,6 +16,7 @@ export class SessionSelectionComponent implements OnInit {
   // isSettingUpSession is used to indicate whether CATcher is in the midst of setting up the session.
   isSettingUpSession: boolean;
   profileForm: FormGroup;
+  selectedProfile: Profile;
 
   @Input() urlEncodedSessionName: string;
 
@@ -36,12 +37,13 @@ export class SessionSelectionComponent implements OnInit {
   }
 
   /**
-   * Fills the login form with data from the given Profile.
+   * Fills the login form with data from the given Profile and sets selectedProfile
    * @param profile - Profile selected by the user.
    */
   onProfileSelect(profile: Profile): void {
     this.profileForm.get('session').setValue(profile.repoName);
     this.sessionEmitter.emit(profile.repoName);
+    this.selectedProfile = profile;
   }
 
   setupSession() {
@@ -55,6 +57,7 @@ export class SessionSelectionComponent implements OnInit {
     // Persist session information in local storage
     window.localStorage.setItem('org', org);
     window.localStorage.setItem('dataRepo', dataRepo);
+    window.localStorage.setItem('profileName', this.selectedProfile.profileName);
     this.githubService.storeOrganizationDetails(org, dataRepo);
 
     this.logger.info(`SessionSelectionComponent: Selected Settings Repo: ${sessionInformation}`);
