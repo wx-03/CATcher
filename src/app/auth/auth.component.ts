@@ -57,6 +57,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       // runs upon receiving oauthCode from the redirect
       this.authService.changeAuthState(AuthState.AwaitingAuthentication);
       this.restoreOrgDetailsFromLocalStorage();
+      this.restoreProfileNameFromLocalStorage();
       this.logger.info('AuthComponent: Obtained authorisation code from Github');
       this.fetchAccessToken(oauthCode, state);
     }
@@ -151,6 +152,11 @@ export class AuthComponent implements OnInit, OnDestroy {
     const dataRepo = window.localStorage.getItem('dataRepo');
     this.githubService.storeOrganizationDetails(org, dataRepo);
     this.phaseService.setSessionData();
+  }
+
+  private restoreProfileNameFromLocalStorage() {
+    const profileName = window.localStorage.getItem('profileName');
+    this.phaseService.setProfileName(profileName);
   }
 
   /**
