@@ -282,6 +282,9 @@
     (click)="this.logIssueEditRouting(issue.id)"
     [routerLink]="'issues/' + issue.id"
     style="cursor: pointer"
+    [ngClass]="{
+      eliminatedIssue: this.issueService.isEliminated(issue)
+    }"
   ></mat-row>
 </mat-table>
 <mat-card *ngIf="this.issues.isLoading$ | async" style="display: flex; justify-content: center; align-items: center">
