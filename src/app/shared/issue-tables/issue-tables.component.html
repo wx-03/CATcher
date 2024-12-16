@@ -185,8 +185,23 @@
   <ng-container matColumnDef="actions">
     <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
     <mat-cell *matCellDef="let issue">
-      <button mat-button matTooltip="Temporarily eliminate this issue" *ngIf="this.isActionVisible(action_buttons.ELIMINATE_ISSUE)">
+      <button
+        mat-button
+        matTooltip="Temporarily eliminate this issue"
+        *ngIf="this.isActionVisible(action_buttons.ELIMINATE_ISSUE) && !this.issueService.isEliminated(issue)"
+        (click)="this.issueService.eliminateIssue(issue); $event.stopPropagation()"
+        style="transform: scale(0.8)"
+      >
         <mat-icon fontIcon="visibility">visibility</mat-icon>
+      </button>
+      <button
+        mat-button
+        matTooltip="Un-eliminate this issue"
+        *ngIf="this.isActionVisible(action_buttons.ELIMINATE_ISSUE) && this.issueService.isEliminated(issue)"
+        (click)="this.issueService.unEliminateIssue(issue); $event.stopPropagation()"
+        style="transform: scale(0.8)"
+      >
+        <mat-icon fontIcon="visibility">visibility_off</mat-icon>
       </button>
       <button
         mat-button
