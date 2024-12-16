@@ -16,7 +16,13 @@
 
     <mat-grid-tile>
       <div class="grid-flush-right">
-        <button *ngIf="permissions.isIssueDeletable()" mat-stroked-button class="delete-eliminated-issues-button" color="primary">
+        <button
+          *ngIf="permissions.isIssueDeletable()"
+          mat-stroked-button
+          class="delete-eliminated-issues-button"
+          color="primary"
+          (click)="this.tryDeleteEliminatedIssues($event)"
+        >
           Delete eliminated issues
         </button>
         <button

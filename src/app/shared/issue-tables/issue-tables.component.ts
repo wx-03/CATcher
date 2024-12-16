@@ -53,8 +53,13 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
 
   // Messages for the modal popup window upon deleting an issue
   private readonly deleteIssueModalMessages = ['Do you wish to delete this issue?', 'This action is irreversible!'];
-  private readonly yesButtonModalMessage = 'Yes, I wish to delete this issue';
-  private readonly noButtonModalMessage = "No, I don't wish to delete this issue";
+  private readonly yesButtonModalMessageDeleteIssue = 'Yes, I wish to delete this issue';
+  private readonly noButtonModalMessageDeleteIssue = "No, I don't wish to delete this issue";
+
+  // Messages for the modal popup window upon deleting eliminated issues
+  private readonly deleteEliminatedIssuesModalMessages = ['Do you wish to delete eliminated issues?', 'This action is irreversible!'];
+  private readonly yesButtonModalMessageDeleteEliminatedIssues = 'Yes, I wish to delete this issue';
+  private readonly noButtonModalMessageDeleteEliminatedIssues = "No, I don't wish to delete this issue";
 
   constructor(
     public userService: UserService,
@@ -160,6 +165,19 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   }
 
   deleteIssue(id: number, event: Event) {
+    this.deleteOneIssue(id, event);
+
+    let snackBarRef = null;
+    snackBarRef = this.snackBar.openFromComponent(UndoActionComponent, {
+      data: { message: `Deleted issue ${id}` },
+      duration: this.snackBarAutoCloseTime
+    });
+    snackBarRef.onAction().subscribe(() => {
+      this.undeleteIssue(id, event);
+    });
+  }
+
+  private deleteOneIssue(id: number, event: Event) {
     this.logger.info(`IssueTablesComponent: Deleting Issue ${id}`);
     this.issuesPendingDeletion = {
       ...this.issuesPendingDeletion,
@@ -180,18 +198,23 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
         }
       );
     event.stopPropagation();
-
-    let snackBarRef = null;
-    snackBarRef = this.snackBar.openFromComponent(UndoActionComponent, {
-      data: { message: `Deleted issue ${id}` },
-      duration: this.snackBarAutoCloseTime
-    });
-    snackBarRef.onAction().subscribe(() => {
-      this.undeleteIssue(id, event);
-    });
   }
 
   undeleteIssue(id: number, event: Event) {
+    this.undeleteOneIssue(id, event);
+
+    this.snackBar.open(`Restored issue ${id}`, '', { duration: this.snackBarAutoCloseTime });
+  }
+
+  undeleteEliminatedIssues(event: Event) {
+    for (let issue of this.issueService.eliminatedIssues) {
+      this.undeleteOneIssue(issue.id, event);
+    }
+
+    this.snackBar.open('Restored eliminated issues', '', { duration: this.snackBarAutoCloseTime });
+  }
+
+  private undeleteOneIssue(id: number, event: Event) {
     this.logger.info(`IssueTablesComponent: Undeleting Issue ${id}`);
     this.issueService.undeleteIssue(id).subscribe(
       (reopenedIssue) => {},
@@ -200,15 +223,13 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
       }
     );
     event.stopPropagation();
-
-    this.snackBar.open(`Restored issue ${id}`, '', { duration: this.snackBarAutoCloseTime });
   }
 
   openDeleteDialog(id: number, event: Event) {
     const dialogRef = this.dialogService.openUserConfirmationModal(
       this.deleteIssueModalMessages,
-      this.yesButtonModalMessage,
-      this.noButtonModalMessage
+      this.yesButtonModalMessageDeleteIssue,
+      this.noButtonModalMessageDeleteIssue
     );
 
     dialogRef.afterClosed().subscribe((res) => {
@@ -217,5 +238,41 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
         this.deleteIssue(id, event);
       }
     });
+  }
+
+  openDeleteEliminatedDialog(event: Event) {
+    const dialogRef = this.dialogService.openUserConfirmationModal(
+      this.deleteEliminatedIssuesModalMessages,
+      this.yesButtonModalMessageDeleteEliminatedIssues,
+      this.noButtonModalMessageDeleteEliminatedIssues
+    );
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res) {
+        this.logger.info('IssueTablesComponent: Deleting eliminated issues');
+        this.deleteEliminatedIssues(event);
+      }
+    });
+  }
+
+  deleteEliminatedIssues(event: Event) {
+    // Loop through set of eliminated issues and delete them
+    for (let issue of this.issueService.eliminatedIssues) {
+      this.deleteOneIssue(issue.id, event);
+    }
+    // Show snackbar to undo
+    let snackBarRef = null;
+    snackBarRef = this.snackBar.openFromComponent(UndoActionComponent, {
+      data: { message: 'Deleted all eliminated issues' },
+      duration: this.snackBarAutoCloseTime
+    });
+    snackBarRef.onAction().subscribe(() => {
+      this.undeleteEliminatedIssues(event);
+      return;
+    });
+    // If no undo, clear eliminated issues set
+    setTimeout(() => {
+      this.issueService.eliminatedIssues.clear();
+    }, this.snackBarAutoCloseTime);
   }
 }

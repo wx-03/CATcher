@@ -3,6 +3,7 @@ import { PermissionService } from '../core/services/permission.service';
 import { UserService } from '../core/services/user.service';
 import { TABLE_COLUMNS } from '../shared/issue-tables/issue-tables-columns';
 import { ACTION_BUTTONS, IssueTablesComponent } from '../shared/issue-tables/issue-tables.component';
+import { IssueService } from '../core/services/issue.service';
 
 @Component({
   selector: 'app-phase-bug-reporting',
@@ -20,11 +21,16 @@ export class PhaseBugReportingComponent implements OnInit {
 
   @ViewChild(IssueTablesComponent, { static: true }) table: IssueTablesComponent;
 
-  constructor(public permissions: PermissionService, public userService: UserService) {}
+  constructor(public permissions: PermissionService, public userService: UserService, private issueService: IssueService) {}
 
   ngOnInit() {}
 
   applyFilter(filterValue: string) {
     this.table.issues.filter = filterValue;
+  }
+
+  tryDeleteEliminatedIssues(event) {
+    // Call function in child
+    this.table.openDeleteEliminatedDialog(event);
   }
 }
