@@ -17,3 +17,8 @@
   display: grid;
   grid-template-columns: auto 20%;
 }
+
+.infoIcon:hover {
+  cursor: pointer;
+  color: #585858;
+}

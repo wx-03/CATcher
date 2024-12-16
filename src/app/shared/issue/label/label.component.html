@@ -17,7 +17,7 @@
     </button>
 
     <button *ngIf="hasLabelDefinition(value)" class="infoPopup" (click)="openDefinitionPage(value); $event.stopPropagation()">
-      <mat-icon style="font-size: 20px">info</mat-icon>
+      <mat-icon class="infoIcon" style="font-size: 20px">info</mat-icon>
     </button>
   </div>
 </mat-menu>
