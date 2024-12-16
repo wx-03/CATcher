@@ -39,7 +39,7 @@ export class IssueService {
   /** Whether the IssueService is creating a new team response */
   private isCreatingTeamResponse = false;
 
-  private eliminatedIssueIds: Set<string> = new Set();
+  private eliminatedIssueIds: Set<number> = new Set();
 
   constructor(
     private githubService: GithubService,
@@ -536,14 +536,14 @@ export class IssueService {
   }
 
   isEliminated(issue: Issue): boolean {
-    return this.eliminatedIssueIds.has(issue.globalId);
+    return this.eliminatedIssueIds.has(issue.id);
   }
 
   eliminateIssue(issue: Issue): void {
-    this.eliminatedIssueIds.add(issue.globalId);
+    this.eliminatedIssueIds.add(issue.id);
   }
 
   unEliminateIssue(issue: Issue): void {
-    this.eliminatedIssueIds.delete(issue.globalId);
+    this.eliminatedIssueIds.delete(issue.id);
   }
 }
