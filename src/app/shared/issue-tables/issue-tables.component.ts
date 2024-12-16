@@ -58,8 +58,8 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
 
   // Messages for the modal popup window upon deleting eliminated issues
   private readonly deleteEliminatedIssuesModalMessages = ['Do you wish to delete eliminated issues?', 'This action is irreversible!'];
-  private readonly yesButtonModalMessageDeleteEliminatedIssues = 'Yes, I wish to delete this issue';
-  private readonly noButtonModalMessageDeleteEliminatedIssues = "No, I don't wish to delete this issue";
+  private readonly yesButtonModalMessageDeleteEliminatedIssues = 'Yes, I wish to delete them';
+  private readonly noButtonModalMessageDeleteEliminatedIssues = "No, I don't wish to delete them";
 
   constructor(
     public userService: UserService,
