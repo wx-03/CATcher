@@ -3,6 +3,7 @@ import { PermissionService } from '../core/services/permission.service';
 import { UserService } from '../core/services/user.service';
 import { TABLE_COLUMNS } from '../shared/issue-tables/issue-tables-columns';
 import { ACTION_BUTTONS, IssueTablesComponent } from '../shared/issue-tables/issue-tables.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-phase-bug-reporting',
@@ -15,9 +16,24 @@ export class PhaseBugReportingComponent implements OnInit {
 
   @ViewChild(IssueTablesComponent, { static: true }) table: IssueTablesComponent;
 
+  typeCount$: Observable<Map<string, number>>;
+  severityCount$: Observable<Map<string, number>>;
+
+  typeCount: Map<string, number> = new Map();
+  severityCount: Map<string, number> = new Map();
+
   constructor(public permissions: PermissionService, public userService: UserService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.typeCount$ = this.table.typeCount$;
+    this.severityCount$ = this.table.severityCount$;
+    this.typeCount$.subscribe((data) => {
+      this.typeCount = new Map(data);
+    });
+    this.severityCount$.subscribe((data) => {
+      this.severityCount = new Map(data);
+    });
+  }
 
   applyFilter(filterValue: string) {
     this.table.issues.filter = filterValue;

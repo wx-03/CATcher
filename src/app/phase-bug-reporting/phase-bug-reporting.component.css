@@ -31,3 +31,9 @@
 .mat-column-severity {
   width: 23%;
 }
+
+.stats-div {
+  display: flex;
+  gap: 50px;
+  justify-content: start;
+}
