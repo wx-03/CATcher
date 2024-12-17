@@ -236,16 +236,16 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
       const severityLabelStrings = this.getSeverityLabelStrings();
 
       for (let severityLabelName of severityLabelStrings) {
-        severityCount[severityLabelName] = 0;
+        severityCount.set(severityLabelName, 0);
       }
       for (let typeLabelName of typeLabelStrings) {
-        typeCount[typeLabelName] = 0;
+        typeCount.set(typeLabelName, 0);
       }
 
       // Update count
       for (let issue of data) {
-        severityCount[issue.severity]++;
-        typeCount[issue.type]++;
+        severityCount.set(issue.severity, severityCount.get(issue.severity) + 1);
+        typeCount.set(issue.type, typeCount.get(issue.type) + 1);
       }
 
       this.typeCountBehaviorSubj.next(typeCount);

@@ -19,11 +19,20 @@ export class PhaseBugReportingComponent implements OnInit {
   typeCount$: Observable<Map<string, number>>;
   severityCount$: Observable<Map<string, number>>;
 
+  typeCount: Map<string, number> = new Map();
+  severityCount: Map<string, number> = new Map();
+
   constructor(public permissions: PermissionService, public userService: UserService) {}
 
   ngOnInit() {
     this.typeCount$ = this.table.typeCount$;
     this.severityCount$ = this.table.severityCount$;
+    this.typeCount$.subscribe((data) => {
+      this.typeCount = new Map(data);
+    });
+    this.severityCount$.subscribe((data) => {
+      this.severityCount = new Map(data);
+    });
   }
 
   applyFilter(filterValue: string) {

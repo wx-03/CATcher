@@ -30,8 +30,12 @@
   </mat-grid-list>
 
   <app-issue-tables table_name="tableBugReporting" [headers]="this.displayedColumns" [actions]="this.actionButtons"></app-issue-tables>
-  <div class="type-stats">
-    Label counts:
-    <p *ngFor="let label of (typeCount$ | async).entries() | keyvalue">{{ label.key }}: {{ label.value }}</p>
+  <div class="stats-div">
+    <div class="type-stats">
+      <p *ngFor="let entry of this.typeCount | keyvalue">{{ entry.key }}: {{ entry.value }}</p>
+    </div>
+    <div class="severity-stats">
+      <p *ngFor="let entry of this.severityCount | keyvalue">{{ entry.key }}: {{ entry.value }}</p>
+    </div>
   </div>
 </div>
