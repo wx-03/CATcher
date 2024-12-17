@@ -15,11 +15,25 @@ export class PhaseBugReportingComponent implements OnInit {
 
   @ViewChild(IssueTablesComponent, { static: true }) table: IssueTablesComponent;
 
+  typeCount: Map<string, number>;
+  severityCount: Map<string, number>;
+
   constructor(public permissions: PermissionService, public userService: UserService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.typeCount = this.table.typeCount;
+    this.severityCount = this.table.severityCount;
+  }
 
   applyFilter(filterValue: string) {
     this.table.issues.filter = filterValue;
+  }
+
+  updateCount() {
+    this.typeCount = this.table.typeCount;
+    this.severityCount = this.table.severityCount;
+    console.log('EVENT DETECTED');
+    console.log(this.typeCount);
+    console.log(this.severityCount);
   }
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -17,6 +17,7 @@ import { PhaseService } from '../../core/services/phase.service';
 import { UserService } from '../../core/services/user.service';
 import { UndoActionComponent } from '../../shared/action-toasters/undo-action/undo-action.component';
 import { IssuesDataTable } from './IssuesDataTable';
+import { EventEmitter } from '@angular/core';
 
 export enum ACTION_BUTTONS {
   VIEW_IN_WEB,
@@ -39,12 +40,16 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   @Input() actions: ACTION_BUTTONS[];
   @Input() filters?: any = undefined;
   @Input() table_name: string;
+  @Output() countChanged = new EventEmitter();
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   issues: IssuesDataTable;
   issuesPendingDeletion: { [id: number]: boolean };
+
+  typeCount: Map<string, number> = new Map();
+  severityCount: Map<string, number> = new Map();
 
   public tableSettings: TableSettings;
 
@@ -73,11 +78,13 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
     this.issues = new IssuesDataTable(this.issueService, this.sort, this.paginator, this.headers, this.filters);
     this.issuesPendingDeletion = {};
     this.tableSettings = this.issueTableSettingsService.getTableSettings(this.table_name);
+    this.initLabelCounts();
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.issues.loadIssues();
+      this.getLabelsCount();
     });
   }
 
@@ -216,5 +223,33 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
         this.deleteIssue(id, event);
       }
     });
+  }
+
+  getLabelsCount() {
+    this.issues.connect().subscribe((data) => {
+      for (let issue of data) {
+        this.severityCount[issue.severity]++;
+        this.typeCount[issue.type]++;
+      }
+
+      this.severityCount = this.severityCount;
+      this.typeCount = this.typeCount;
+
+      this.countChanged.emit();
+    });
+  }
+
+  initLabelCounts() {
+    const typeLabelStrings: string[] = this.labelService.getLabelList('type').map((label) => label.labelValue);
+    const severityLabelStrings: string[] = this.labelService.getLabelList('severity').map((label) => label.labelValue);
+
+    for (let severityLabelName of severityLabelStrings) {
+      this.severityCount[severityLabelName] = 0;
+    }
+
+    let typeCount = new Map();
+    for (let typeLabelName of typeLabelStrings) {
+      this.typeCount[typeLabelName] = 0;
+    }
   }
 }

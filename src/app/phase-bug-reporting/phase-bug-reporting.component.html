@@ -29,5 +29,14 @@
     </mat-grid-tile>
   </mat-grid-list>
 
-  <app-issue-tables table_name="tableBugReporting" [headers]="this.displayedColumns" [actions]="this.actionButtons"></app-issue-tables>
+  <app-issue-tables
+    table_name="tableBugReporting"
+    [headers]="this.displayedColumns"
+    [actions]="this.actionButtons"
+    (countChanged)="this.updateCount()"
+  ></app-issue-tables>
+  <div class="type-stats">
+    Label counts:
+    <p *ngFor="let label of this.typeCount | keyvalue">{{ label.key }}: {{ label.value }}</p>
+  </div>
 </div>
