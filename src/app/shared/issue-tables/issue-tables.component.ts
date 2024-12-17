@@ -17,7 +17,7 @@ import { PhaseService } from '../../core/services/phase.service';
 import { UserService } from '../../core/services/user.service';
 import { UndoActionComponent } from '../../shared/action-toasters/undo-action/undo-action.component';
 import { IssuesDataTable } from './IssuesDataTable';
-import { EventEmitter } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 export enum ACTION_BUTTONS {
   VIEW_IN_WEB,
@@ -40,7 +40,6 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   @Input() actions: ACTION_BUTTONS[];
   @Input() filters?: any = undefined;
   @Input() table_name: string;
-  @Output() countChanged = new EventEmitter();
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -48,8 +47,8 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   issues: IssuesDataTable;
   issuesPendingDeletion: { [id: number]: boolean };
 
-  typeCount: Map<string, number> = new Map();
-  severityCount: Map<string, number> = new Map();
+  typeCount = new BehaviorSubject(new Map<string, number>());
+  severityCount = new BehaviorSubject(new Map<string, number>());
 
   public tableSettings: TableSettings;
 
@@ -78,7 +77,6 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
     this.issues = new IssuesDataTable(this.issueService, this.sort, this.paginator, this.headers, this.filters);
     this.issuesPendingDeletion = {};
     this.tableSettings = this.issueTableSettingsService.getTableSettings(this.table_name);
-    this.initLabelCounts();
   }
 
   ngAfterViewInit(): void {
@@ -228,42 +226,28 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   getLabelsCount() {
     this.issues.connect().subscribe((data) => {
       // Reset count
+      let typeCount: Map<string, number> = new Map();
+      let severityCount: Map<string, number> = new Map();
+
       const typeLabelStrings = this.getTypeLabelStrings();
       const severityLabelStrings = this.getSeverityLabelStrings();
 
-      for (let label of typeLabelStrings) {
-        this.typeCount[label] = 0;
+      for (let severityLabelName of severityLabelStrings) {
+        severityCount[severityLabelName] = 0;
       }
-      for (let label of severityLabelStrings) {
-        this.severityCount[label] = 0;
+      for (let typeLabelName of typeLabelStrings) {
+        typeCount[typeLabelName] = 0;
       }
 
       // Update count
       for (let issue of data) {
-        this.severityCount[issue.severity]++;
-        this.typeCount[issue.type]++;
+        severityCount[issue.severity]++;
+        typeCount[issue.type]++;
       }
 
-      console.log('FROM ISSUE TABLES COMPONENT:');
-      console.log(this.typeCount);
-      console.log(this.severityCount);
-
-      this.countChanged.emit();
+      this.typeCount.next(typeCount);
+      this.severityCount.next(severityCount);
     });
-  }
-
-  initLabelCounts() {
-    const typeLabelStrings: string[] = this.getTypeLabelStrings();
-    const severityLabelStrings: string[] = this.getSeverityLabelStrings();
-
-    for (let severityLabelName of severityLabelStrings) {
-      this.severityCount[severityLabelName] = 0;
-    }
-
-    let typeCount = new Map();
-    for (let typeLabelName of typeLabelStrings) {
-      this.typeCount[typeLabelName] = 0;
-    }
   }
 
   private getSeverityLabelStrings(): string[] {

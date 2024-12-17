@@ -20,20 +20,9 @@ export class PhaseBugReportingComponent implements OnInit {
 
   constructor(public permissions: PermissionService, public userService: UserService) {}
 
-  ngOnInit() {
-    this.typeCount = this.table.typeCount;
-    this.severityCount = this.table.severityCount;
-  }
+  ngOnInit() {}
 
   applyFilter(filterValue: string) {
     this.table.issues.filter = filterValue;
-  }
-
-  updateCount() {
-    this.typeCount = this.table.typeCount;
-    this.severityCount = this.table.severityCount;
-    console.log('EVENT DETECTED');
-    console.log(this.typeCount);
-    console.log(this.severityCount);
   }
 }
