@@ -47,8 +47,11 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   issues: IssuesDataTable;
   issuesPendingDeletion: { [id: number]: boolean };
 
-  typeCount = new BehaviorSubject(new Map<string, number>());
-  severityCount = new BehaviorSubject(new Map<string, number>());
+  private typeCountBehaviorSubj = new BehaviorSubject(new Map<string, number>());
+  private severityCountBehaviorSubj = new BehaviorSubject(new Map<string, number>());
+
+  public typeCount$ = this.typeCountBehaviorSubj.asObservable();
+  public severityCount$ = this.severityCountBehaviorSubj.asObservable();
 
   public tableSettings: TableSettings;
 
@@ -245,8 +248,8 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
         typeCount[issue.type]++;
       }
 
-      this.typeCount.next(typeCount);
-      this.severityCount.next(severityCount);
+      this.typeCountBehaviorSubj.next(typeCount);
+      this.severityCountBehaviorSubj.next(severityCount);
     });
   }
 
