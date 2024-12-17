@@ -227,21 +227,34 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
 
   getLabelsCount() {
     this.issues.connect().subscribe((data) => {
+      // Reset count
+      const typeLabelStrings = this.getTypeLabelStrings();
+      const severityLabelStrings = this.getSeverityLabelStrings();
+
+      for (let label of typeLabelStrings) {
+        this.typeCount[label] = 0;
+      }
+      for (let label of severityLabelStrings) {
+        this.severityCount[label] = 0;
+      }
+
+      // Update count
       for (let issue of data) {
         this.severityCount[issue.severity]++;
         this.typeCount[issue.type]++;
       }
 
-      this.severityCount = this.severityCount;
-      this.typeCount = this.typeCount;
+      console.log('FROM ISSUE TABLES COMPONENT:');
+      console.log(this.typeCount);
+      console.log(this.severityCount);
 
       this.countChanged.emit();
     });
   }
 
   initLabelCounts() {
-    const typeLabelStrings: string[] = this.labelService.getLabelList('type').map((label) => label.labelValue);
-    const severityLabelStrings: string[] = this.labelService.getLabelList('severity').map((label) => label.labelValue);
+    const typeLabelStrings: string[] = this.getTypeLabelStrings();
+    const severityLabelStrings: string[] = this.getSeverityLabelStrings();
 
     for (let severityLabelName of severityLabelStrings) {
       this.severityCount[severityLabelName] = 0;
@@ -251,5 +264,13 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
     for (let typeLabelName of typeLabelStrings) {
       this.typeCount[typeLabelName] = 0;
     }
+  }
+
+  private getSeverityLabelStrings(): string[] {
+    return this.labelService.getLabelList('severity').map((label) => label.labelValue);
+  }
+
+  private getTypeLabelStrings(): string[] {
+    return this.labelService.getLabelList('type').map((label) => label.labelValue);
   }
 }
