@@ -11,6 +11,7 @@
   <a class="mat-toolbar mat-primary" style="text-decoration: none" [routerLink]="phaseService.currentPhase"
     >CATcher v{{ this.getVersion() }}</a
   >
+  <span id="profile-name-display" *ngIf="auth.isAuthenticated()">&nbsp;{{ phaseService.getProfileName() }}</span>
   <span id="phase-descriptor" *ngIf="auth.isAuthenticated()" style="margin-left: 10px">
     ({{ this.getPhaseDescription(phaseService.currentPhase) }})
   </span>
