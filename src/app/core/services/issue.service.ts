@@ -39,6 +39,8 @@ export class IssueService {
   /** Whether the IssueService is creating a new team response */
   private isCreatingTeamResponse = false;
 
+  eliminatedIssues: Set<Issue> = new Set();
+
   constructor(
     private githubService: GithubService,
     private userService: UserService,
@@ -87,15 +89,14 @@ export class IssueService {
           return EMPTY;
         }
         return this.githubService.fetchIssueGraphql(issueId).pipe(
-            map((response) => {
-              const issue = this.createIssueModel(response);
-              this.updateLocalStore(issue);
-              return issue;
-            }),
-            catchError((err) => this.getIssue(issueId))
-          );
-        }
-      )
+          map((response) => {
+            const issue = this.createIssueModel(response);
+            this.updateLocalStore(issue);
+            return issue;
+          }),
+          catchError((err) => this.getIssue(issueId))
+        );
+      })
     );
   }
 
@@ -532,5 +533,17 @@ export class IssueService {
 
   getIssueTeamFilter(): string {
     return this.issueTeamFilter;
+  }
+
+  isEliminated(issue: Issue): boolean {
+    return this.eliminatedIssues.has(issue);
+  }
+
+  eliminateIssue(issue: Issue): void {
+    this.eliminatedIssues.add(issue);
+  }
+
+  unEliminateIssue(issue: Issue): void {
+    this.eliminatedIssues.delete(issue);
   }
 }

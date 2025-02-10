@@ -31,3 +31,7 @@
 .mat-column-severity {
   width: 23%;
 }
+
+.delete-eliminated-issues-button {
+  margin: 10px;
+}

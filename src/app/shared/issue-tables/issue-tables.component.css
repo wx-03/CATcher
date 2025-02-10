@@ -79,3 +79,7 @@
 .title-wrap {
   overflow-wrap: anywhere;
 }
+
+.eliminatedIssue {
+  opacity: 0.3;
+}

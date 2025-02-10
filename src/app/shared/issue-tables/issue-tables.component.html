@@ -193,6 +193,24 @@
     <mat-cell *matCellDef="let issue">
       <button
         mat-button
+        matTooltip="Temporarily eliminate this issue"
+        *ngIf="this.isActionVisible(action_buttons.ELIMINATE_ISSUE) && !this.issueService.isEliminated(issue)"
+        (click)="this.issueService.eliminateIssue(issue); $event.stopPropagation()"
+        style="transform: scale(0.8)"
+      >
+        <mat-icon>visibility</mat-icon>
+      </button>
+      <button
+        mat-button
+        matTooltip="Un-eliminate this issue"
+        *ngIf="this.isActionVisible(action_buttons.ELIMINATE_ISSUE) && this.issueService.isEliminated(issue)"
+        (click)="this.issueService.unEliminateIssue(issue); $event.stopPropagation()"
+        style="transform: scale(0.8)"
+      >
+        <mat-icon>visibility_off</mat-icon>
+      </button>
+      <button
+        mat-button
         matTooltip="View this issue on GitHub"
         *ngIf="this.isActionVisible(action_buttons.VIEW_IN_WEB)"
         (click)="this.viewIssueInBrowser(issue.id, $event)"
@@ -270,6 +288,9 @@
     (click)="this.logIssueEditRouting(issue.id)"
     [routerLink]="'issues/' + issue.id"
     style="cursor: pointer"
+    [ngClass]="{
+      eliminatedIssue: this.issueService.isEliminated(issue)
+    }"
   ></mat-row>
 </mat-table>
 <mat-card *ngIf="this.issues.isLoading$ | async" style="display: flex; justify-content: center; align-items: center">
