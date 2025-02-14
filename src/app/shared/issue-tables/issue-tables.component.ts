@@ -17,6 +17,7 @@ import { PhaseService } from '../../core/services/phase.service';
 import { UserService } from '../../core/services/user.service';
 import { UndoActionComponent } from '../../shared/action-toasters/undo-action/undo-action.component';
 import { IssuesDataTable } from './IssuesDataTable';
+import { BehaviorSubject } from 'rxjs';
 
 export enum ACTION_BUTTONS {
   VIEW_IN_WEB,
@@ -45,6 +46,12 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
 
   issues: IssuesDataTable;
   issuesPendingDeletion: { [id: number]: boolean };
+
+  private typeCountBehaviorSubj = new BehaviorSubject(new Map<string, number>());
+  private severityCountBehaviorSubj = new BehaviorSubject(new Map<string, number>());
+
+  public typeCount$ = this.typeCountBehaviorSubj.asObservable();
+  public severityCount$ = this.severityCountBehaviorSubj.asObservable();
 
   public tableSettings: TableSettings;
 
@@ -78,6 +85,7 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.issues.loadIssues();
+      this.getLabelsCount();
     });
   }
 
@@ -220,5 +228,40 @@ export class IssueTablesComponent implements OnInit, AfterViewInit {
         this.deleteIssue(id, event);
       }
     });
+  }
+
+  getLabelsCount() {
+    this.issues.connect().subscribe((data) => {
+      // Reset count
+      let typeCount: Map<string, number> = new Map();
+      let severityCount: Map<string, number> = new Map();
+
+      const typeLabelStrings = this.getTypeLabelStrings();
+      const severityLabelStrings = this.getSeverityLabelStrings();
+
+      for (let severityLabelName of severityLabelStrings) {
+        severityCount.set(severityLabelName, 0);
+      }
+      for (let typeLabelName of typeLabelStrings) {
+        typeCount.set(typeLabelName, 0);
+      }
+
+      // Update count
+      for (let issue of data) {
+        severityCount.set(issue.severity, severityCount.get(issue.severity) + 1);
+        typeCount.set(issue.type, typeCount.get(issue.type) + 1);
+      }
+
+      this.typeCountBehaviorSubj.next(typeCount);
+      this.severityCountBehaviorSubj.next(severityCount);
+    });
+  }
+
+  private getSeverityLabelStrings(): string[] {
+    return this.labelService.getLabelList('severity').map((label) => label.labelValue);
+  }
+
+  private getTypeLabelStrings(): string[] {
+    return this.labelService.getLabelList('type').map((label) => label.labelValue);
   }
 }
