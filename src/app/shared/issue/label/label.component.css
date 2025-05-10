@@ -35,3 +35,8 @@
   font-size: 1em;
   text-align: left;
 }
+
+.infoIcon:hover {
+  cursor: pointer;
+  color: #585858;
+}
